@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Create a new entry</h2>
+<p>Fill the details below to register a new case</p>
+<form action="/litigation/new/" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row gtr-uniform">
+        <div class="col-12 col-12-xsmall">
+            Name: <input type="text" name="name" placeholder="Name" required>
+        </div>
+        <div class="col-4 col-4-xsmall">
+            Case Type: <select name="case-type" required>
+                <option disabled>Select</option>
+                <option value="OS">OS</option>
+                <option value="MC">MC</option>
+                <option value="CRL.MISC">CRL.MISC</option>
+                <option value="CIVIL.MISC">CIVIL.MISC</option>
+                <option value="CC">Consumer Complaint</option>
+                <option value="CN">Crime No.</option>
+                <option value="WP">WP</option>
+                <option value="RFA">RFA</option>
+                <option value="WA">WA</option>
+                <option value="MFA">MFA</option>
+                <option value="LRF">LRF</option>
+                <option value="RA">RA</option>
+                <option value="MA">MA</option>
+                <option value="MISC">MISC</option>
+                <option value="HRA">HRA</option>
+                <option value="CRL.APPEAL">CRL.APPEAL</option>
+                <option value="CRP">CRP</option>
+            </select>
+        </div>
+        <div class="col-5 col-5-xsmall">
+            Case Number: <input type="text" name="case-number-1" required>
+        </div>
+        <div class="col-3 col-3-xsmall">
+            Case Year:
+            <input type="text" name="case-number-2" required>
+        </div>
+        <div class="col-12 col-12-xsmall">
+            Representing For: <input type="text" name="representing-for">
+        </div>
+        <div class="col-12 col-12-xsmall">
+            Rough Work Picture: <input type="file" name="rough-picture" accept="image/jpg, image/png, image/jpeg">
+        </div>
+        <div class="col-12 col-12-xsmall">
+            <input type="submit" class="primary large"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="reset" class="large">
+        </div>
+    </div>
+</form>
+{% endblock %}

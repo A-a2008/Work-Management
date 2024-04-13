@@ -1,0 +1,41 @@
+litigation
+Name, Case type, Case number (*/----), Representing for, rough work picture
+Case types:
+OS, MC, CRL.MISC, CIVIL.MISC, Consumer Complaint, Crime No., WP, RFA, WA, MFA, LRF, RA, MA, MISC, HRA, CRL.APPEAL, CRP
+Add document link (Google doc)
+
+Work:
+To:
+Completion Date:
+frequency - 3 times day- 9:30, 3, 6:30 (3 days and less)
+
+
+non-litigation
+Name, Project name, situation, type, site no., present owner
+type: Site, Villa, Gated Community, Apartment, Row Houses
+Completion Date: (default 7 days)
+frequency: (before 3 days) - 1 time - 7:30
+
+1. Required list of documents (1 week)
+3 days before start reminder 
+2. Remind client to send details (after 3 days of 1.)
+3. Send opinion (3 days)
+Before 2 days start reminder 
+
+General: Document link
+
+Add second stage
+Work
+Completion date
+Before how many days to start reminder
+
+
+L: Amma, suprith, Kiran
+NL: Amma, Veena
+
+
+- Modification
+
+Work Assessment:
+Works done
+Work done in time 
