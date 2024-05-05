@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Litigation</h1>
+    </header>
+    <p>
+        View all Litigation files here. Click to view more details
+        <br><br>
+        <a href="{% url 'litigation_new' %}" class="button">Create New</a><br><br>
+        <input type="text" id="search_input" placeholder="Search..." >
+        {% if files %}
+        <div class="table-wrapper">
+            <table id="cases">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Case Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in files %}
+                    <tr>
+                        <td><a href="{% url 'litigation_view_file' file_id=file.id %}">{{ file }}</a></td>
+                        <td>{{ file.case_number }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <br>
+        No cases created yet.
+        {% endif %}
+        <p id="no_result" style="display: none;">No results found!</p>
+    </p>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the input element, table, and no results message
+    var input = document.getElementById('search_input');
+    var table = document.getElementById('cases');
+    var noResults = document.getElementById('no_result');
+
+    // Add event listener for input
+    input.addEventListener('input', function() {
+    var filter = input.value.toUpperCase();
+    var rows = table.getElementsByTagName('tr');
+    var found = false;
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (var i = 1; i < rows.length; i++) { // Start from index 1 to skip header row
+        var cells = rows[i].getElementsByTagName('td');
+        var rowFound = false;
+        for (var j = 0; j < cells.length; j++) {
+        var cellText = cells[j].textContent || cells[j].innerText;
+        if (cellText.toUpperCase().indexOf(filter) > -1) {
+            rowFound = true;
+            found = true;
+            break;
+        }
+        }
+        if (rowFound) {
+        rows[i].style.display = '';
+        } else {
+        rows[i].style.display = 'none';
+        }
+    }
+
+    // Show or hide the no results message based on whether any rows are found
+    if (found) {
+        noResults.style.display = 'none';
+        table.style.display = ''; // Show the table
+    } else {
+        noResults.style.display = ''; // Show the no results message
+        table.style.display = 'none'; // Hide the table
+    }
+    });
+});
+</script>
+{% endblock %}

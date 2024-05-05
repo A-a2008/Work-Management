@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Thank you! You are registered for EventHub</h1>
+        <h2>Now you can use this website anywhere in the world and access it on the go</h2>
+    </header>
+    <p>
+        <dl>
+            <dt>Your Details:</dt>
+            <b>
+                <dd>Name: {{ name }}</dd>
+                <dd>Username: {{ username }}</dd>
+                <dd>Email: {{ email }}</dd>
+                <dd>Phone Number: {{ phone_number }}</dd>
+            </b>
+        </dl>
+    </p>
+</section>
+{% endblock %}

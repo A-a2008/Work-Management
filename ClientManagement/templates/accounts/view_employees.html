@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Employees</h1>
+        <h3>View all employees here. All the actions relating to the employees are also present.</h3>
+    </header>
+    <p>
+        {% if employees %}
+        <div class="table-wrapper">
+            <table>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        {% if not user == employee %}
+                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="align-right">
+                            <a href="{% url 'delete_employee_confirm' employee_id=employee.id %}" class="button small">Delete</a>
+                        </td>
+                        <td class="align-right">
+                            
+                            <a href="{% url 'reverse_employee_status_confirm' employee_id=employee.id %}" class="button small">
+                                {% if employee.is_superuser %}
+                                Remove as Admin
+                                {% else %}
+                                Make as Admin
+                                {% endif %}
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>
+            <h4>No Employees yet!</h4>
+        </p>
+        {% endif %}
+    </p>
+</section>
+{% endblock %}

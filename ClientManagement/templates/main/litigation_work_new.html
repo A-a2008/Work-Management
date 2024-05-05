@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Litigation</h1>
+    </header>
+    <p>
+        <h2>Add Work</h2>
+        <p>
+            Enter the details below to add work for this file
+        </p>
+        <form action="{% url 'litigation_work_new' file_id=file_id %}" method="post">
+            {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-12 col-12-xsmall">
+                    Work: <input type="text" name="work" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Details: <textarea rows="4" name="details"></textarea>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    To: <select name="to" required>
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Priority Level: <select name="priority_level" required>
+                        <option value="High">High</option>
+                        <option value="Normal" selected>Normal</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Completion Date: <input type="date" name="completion_date" value="{{ completion_date }}" required>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Reminder Start Date: <input type="date" name="reminder_start_date" value="{{ reminder_start_date }}" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" class="primary large"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="reset" class="large">
+                </div>
+            </div>
+        </form>
+    </p>
+</section>
+{% endblock %}

@@ -1,4 +1,13 @@
+{% extends 'base.html' %}
+
 {% block content %}
-<h2>$Title$</h2>
-<p>$Content$</p>
+<section>
+    <header class="main">
+        <h1>$Title$</h1>
+        <h2>$Sub_Title$</h2>
+    </header>
+    <p>
+        $Content$
+    </p>
+</section>
 {% endblock %}

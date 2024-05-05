@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Litigation</h1>
+    </header>
+    <p>
+        <div class="row gtr-200">
+            <div class="col-6 col-12-xsmall">
+                <h2>Name: {{ file.name }}</h2>
+                <h3>Case Number: {{ file.case_number }}</h3>
+                <h3>Case Type: {{ file.case_type }}</h3>
+                <h3>Representing For: {{ file.representing_for }}</h3>
+                <h3>
+                    Document Link: 
+                    {% if document_link %}
+                    <a href="{{ file.document_link }}" target="_blank">{{ file.document_link|truncatechars:25 }}</a>
+                    {% else %}
+                    <a id="toggle_form">Provide Here...</a>
+                    <form id="document_link_form" style="display: none;" action="{% url 'litigation_file_add_document_link' file_id=file.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="document_link" required><br>
+                        <input type="submit" class="button primary small">
+                    </form>
+                    {% endif %}
+                </h3>
+                <h3>
+                    {% if not file.rough_work_pic %}
+                    <a id="toggle_rough_pic" class="button small">Add Rough Work Pic</a>
+                    <form id="rough_pic_form" style="display: none;" action="{% url 'litigation_add_rough_pic' file_id=file.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        Rough Work Pic: <input type="file" name="rough_picture" accept="image/jpg, image/png, image/jpeg"><br><br>
+                        <input type="submit" class="button small primary" placeholder="Add">
+                    </form>
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="col-6 col-12-xsmall">
+                {% if file.rough_work_pic %}
+                <span class="image main">
+                    <img src="{{ file.rough_work_pic.url }}" alt="Rough Work Picture">
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <hr>
+        <h2>Work</h2>
+        <a href="{% url 'litigation_work_new' file_id=file.id %}" class="button">Create New</a>
+        <br><br>
+        {% if works %}
+        <ol>
+            {% for work in works %}
+            <li class="work">
+                <p>
+                    Work: <b>{{ work.work }}</b><br>
+                    {% if work.details %}
+                    <b>{{ work.details }}</b><br>
+                    {% endif %}
+                    To: <b>{{ work.to_name }}</b><br>
+                    Completion Date: <b>{{ work.completion_date }}</b><br>
+                    Priority level: <b>{{ work.priority_level }}</b>
+                </p>
+                {% if not work.finished %}
+                <a href="{% url 'litigation_finished_work' work_id=work.id %}" class="button small primary">Finish</a>
+                {% else %}
+                <a href="{% url 'litigation_mark_unfinished_work' work_id=work.id %}" class="button small">Mark Unfinished?</a>
+                {% endif %}
+                <hr>
+            </li>
+            {% endfor %}
+        </ol>
+        {% else %}
+        <br>
+        No work assigned yet. Create one now!
+        {% endif %}
+    </p>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var toggleLink = document.getElementById('toggle_rough_pic');
+    var form = document.getElementById('rough_pic_form');
+
+    toggleLink.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default link behavior
+
+        // Toggle form visibility
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            toggleLink.style.display = 'none'; // Hide the link when form is shown
+        } else {
+            form.style.display = 'none';
+            toggleLink.style.display = 'inline'; // Show the link when form is hidden
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    var toggleLink = document.getElementById('toggle_form');
+    var form = document.getElementById('document_link_form');
+
+    toggleLink.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default link behavior
+
+        // Toggle form visibility
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            toggleLink.style.display = 'none'; // Hide the link when form is shown
+        } else {
+            form.style.display = 'none';
+            toggleLink.style.display = 'inline'; // Show the link when form is hidden
+        }
+    });
+});
+</script>
+{% endblock %}

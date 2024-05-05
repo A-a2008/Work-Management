@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Login</h1>
+        <h2>Login to this site and access your account</h2>
+    </header>
+    <p>
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            {% for message in messages %}
+            <p class="error">{{ message }} <br /></p><br />
+            {% endfor %}
+            <font size="3">Not a User? <a href="{% url 'register' %}">Register</a> yourself here</font><br /><br />
+            Username: <input type="text" name="username" placeholder="Username" required ><br />
+            Password: <input type="password" name="password" placeholder="Password" required ><br>
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            <input type='submit' class="button primary" value="Login">
+            <input type="reset" class="button" value="Reset">
+        </form>
+    </p>
+</section>
+{% endblock %}

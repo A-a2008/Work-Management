@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Non Litigation</h1>
+        <h2>Add new work</h2>
+    </header>
+    <p>
+        Add the completion date for the work.
+        {% if file.case_stage <= 3 %}
+        <form action="{% url 'nonlitigation_work_stage1_new' file_id=file.id %}" method="post">
+            {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-12 col-12-xsmall">
+                    <h3>Work: {{ work }}</h3>
+                    <input type="hidden" value="{{ work }}" name="work">
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    To: <select name="to" required>
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Completion Date: <input type="date" name="completion_date" value="{{ completion_date }}" required/>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Reminder Start Date: <input type="date" name="reminder_start_date" value="{{ reminder_start_date }}" required/>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" class="primary">
+                    <input type="reset">
+                </div>
+            </div>
+        </form>
+        {% else %}
+        <form action="{% url 'nonlitigation_work_stage2_new' file_id=file.id %}" method="post">
+            {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-12 col-12-xsmall">
+                    Work: <input type="text" name="work" placeholder="Work" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Details: <textarea rows="4" name="details"></textarea>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    To: <select name="to" required>
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Completion Date: <input type="date" name="completion_date" value="{{ completion_date }}" required/>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Reminder Start Date: <input type="date" name="reminder_start_date" value="{{ reminder_start_date }}" required/>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" class="primary">
+                    <input type="reset">
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </p>
+</section>
+{% endblock %}

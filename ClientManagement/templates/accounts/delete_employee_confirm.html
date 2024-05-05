@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Delete Employee</h1>
+        <h2>Are you sure you want to delete {{ employee.first_name }} {{ employee.last_name }}</h2>
+    </header>
+    <p>
+        <a href="{% url 'delete_employee' employee_id=employee.id %}" class="button large">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{% url 'view_employees' %}" class="button primary large">No</a>
+    </p>
+</section>
+{% endblock %}

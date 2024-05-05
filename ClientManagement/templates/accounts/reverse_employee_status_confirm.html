@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>{{ title }}</h1>
+        <h2>{{ subtitle }}</h2>
+    </header>
+    <p>
+        <a href="{% url 'reverse_employee_status' employee_id=employee.id %}" class="button large">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{% url 'view_employees' %}" class="button primary large">No</a>
+    </p>
+</section>
+{% endblock %}

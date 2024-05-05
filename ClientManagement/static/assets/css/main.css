@@ -23,6 +23,16 @@ section, summary, time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
+
+p.error {
+    color: #f64e4e;
+    font-weight: bold;
+}
+
+.work {
+  font-size: 1.3em;
+}
+
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block; }
@@ -1023,6 +1033,7 @@ input[type="email"],
 input[type="tel"],
 input[type="search"],
 input[type="url"],
+input[type="date"],
 select,
 textarea {
   -moz-appearance: none;
@@ -1045,6 +1056,7 @@ textarea {
   input[type="tel"]:invalid,
   input[type="search"]:invalid,
   input[type="url"]:invalid,
+  input[type="date"]:invalid,
   select:invalid,
   textarea:invalid {
     box-shadow: none; }
@@ -1054,6 +1066,7 @@ textarea {
   input[type="tel"]:focus,
   input[type="search"]:focus,
   input[type="url"]:focus,
+  input[type="date"]:focus,
   select:focus,
   textarea:focus {
     border-color: #f56a6a;
@@ -1081,6 +1094,7 @@ input[type="email"],
 input[type="tel"],
 input[type="search"],
 input[type="url"],
+input[type="date"],
 select {
   height: 2.75em; }
 

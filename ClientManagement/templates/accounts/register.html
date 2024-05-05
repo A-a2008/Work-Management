@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Register</h1>
+        <h2>Register to EventHub to fully use it's features</h2>
+    </header>
+    <p>
+        <form action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+            {% for message in messages %}
+            <p class="error">{{ message|safe }} <br /></p><br />
+            {% endfor %}
+            <div class="row gtr-uniform">
+                <div class="col-6 col-12-xsmall">
+                    First Name: <input type="text" name="first_name" placeholder="First Name" required >
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Last Name: <input type="text" name="last_name" placeholder="Last Name" required >
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Username: <input type="text" name="username" placeholder="Username" required >
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Email: <input type="email" name="email" placeholder="Email" required >
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Password: <input type="password" name="password1" placeholder="Password" required >
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Password (Confirm): <input type="password" name="password2" placeholder="Password (Confirm)" required >
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Phone Number: <input type="text" name="phone_number" placeholder="Phone Number" required>
+                </div>
+                <div class="col-12">
+                    <input type="submit" class="button primary" value="Register">
+                    <input type="reset" class="button" value="Reset">
+                </div>
+            </div>
+        </form>
+    </p>
+</section>
+{% endblock %}

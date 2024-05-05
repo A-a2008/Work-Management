@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Non Litigation</h1>
+        <h2>Fill the form to create a new Non Litigation file</h2>
+    </header>
+    <p>
+        {% if error_message %}
+        <p class="error">{{ error_message }}</p>
+        {% endif %}
+        <form action="{% url 'nonlitigation_new' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-6 col-12-xsmall">
+                    Name: <input type="text" name="name" placeholder="Name" required >
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Project Name: <input type="text" name="project_name" placeholder="Project Name" required >
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Situation: <textarea rows="4" name="situation" required></textarea>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Property Type: <select name="property_type" required>
+                        <option selected disabled>Select</option>
+                        <option value="Site">Site</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Gated Community">Gated Community</option>
+                        <option value="Apartment">Apartment</option>
+                        <option value="Row Houses">Row Houses</option>
+                    </select>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Site No.: <input type="text" name="site_no" placeholder="Site Number" required>
+                </div>
+                <div class="col-12">
+                    Present Owner: <input type="text" name="present_owner" placeholder="Present Owner" requierd>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Document Link (Google Docs 'Editor' link): <input type="url" name="document_link" >
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Rough Work Picture: <input type="file" name="rough_picture" accept="image/jpg, image/png, image/jpeg">
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" class="primary large"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="reset" class="large">
+                </div>
+            </div>
+        </form>
+    </p>
+</section>
+{% endblock %}

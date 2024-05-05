@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'main',
+    'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -70,8 +71,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ClientManagement.wsgi.application'
+AUTH_USER_MODEL = 'accounts.User'
 
+WSGI_APPLICATION = 'ClientManagement.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -122,16 +124,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     join(BASE_DIR, 'static')
 ]
 STATIC_ROOT = join(BASE_DIR, 'assets')
 
 MEDIA_ROOT = join(BASE_DIR, 'media')
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+GOOGLE_APPLICATION_CREDENTIALS = join(BASE_DIR, 'client_secret.json')  # Replace with your file path
