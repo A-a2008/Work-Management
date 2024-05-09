@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Litigation</h1>
+        <h2>View Payment log</h2>
+    </header>
+    <p>
+        <a href="{% url 'litigation_payments_new' file_id=file.id %}" class="button primary">Add Entry</a>
+        <br>
+        {% if payments_dates %}
+        <h3>Log:</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Payment For</th>
+                        <th>Amount Remaining</th>
+                        <th>Amount Paid</th>
+                        <th>Total</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for payment, dates in payments_dates %}
+                        <tr>
+                            <td><a href="{% url 'litigation_payments_edit' payment_id=payment.id %}">{{ payment.name }}</a></td>
+                            <td>₹{{ payment.amount_pending }}</td>
+                            <td>₹{{ payment.total_paid }}</td>
+                            <td>₹{{ payment.amount }}</td>
+                            <td>
+                                {% if dates %}
+                                {% for date in dates %}
+                                {{ date.date_paid }} - ₹{{ date.amount }}<br>
+                                {% endfor %}
+                                {% else %}
+                                Not Done
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <h3>No payments made yet! Consider adding the Consultation Fees</h3>
+        {% endif %}
+    </p>
+</section>
+{% endblock %}

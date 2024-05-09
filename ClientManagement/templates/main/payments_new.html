@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        {% if litigation %}
+        <h1>Litigation</h1>
+        {% else %}
+        <h1>Non Litigation</h1>
+        {% endif %}
+        <h2>Add Payment Entry</h2>
+    </header>
+    <p>
+        <form action="
+        {% if litigation %}
+        {% url 'litigation_payments_new' file_id=file.id %}
+        {% else %}
+        {% url 'nonlitigation_payments_new' file_id=file.id %}
+        {% endif %}
+        " method="post">
+        {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-6 col-12-xsmall">
+                    Name: <input type="text" name="name" placeholder="Name" required>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Amount: <input type="number" name="amount" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" class="primary"> <input type="reset">
+                </div>
+            </div>
+        </form>
+    </p>
+</section>
+{% endblock %}

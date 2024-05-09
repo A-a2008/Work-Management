@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import Group
 from django.apps import apps
 from accounts.models import User
 from datetime import datetime, timedelta
@@ -8,6 +9,10 @@ Litigation = apps.get_model("main", "Litigation")
 WorkLigitation = apps.get_model("main", "WorkLigitation")
 NonLitigation = apps.get_model("main", "NonLitigation")
 WorkNonLitigation = apps.get_model("main", "WorkNonLitigation")
+PaymentsLitigation = apps.get_model("main", "PaymentsLitigation")
+PaymentsNonLitigation = apps.get_model("main", "PaymentsNonLitigation")
+PaymentsLitigationDate = apps.get_model("main", "PaymentsLitigationDate")
+PaymentsNonLitigationDate = apps.get_model("main", "PaymentsNonLitigationDate")
 
 # Create your views here.
 
@@ -47,14 +52,18 @@ def litigation_view_all(request):
     }
     return render(request, "main/litigation_view_all.html", data)
 
-def litigation_view_file(request, file_id):
+def litigation_view_file(request, file_id): # TODO: Arrange works in reverse order. Both litigation and non litigation
     file = Litigation.objects.get(id=file_id)
     document_link = True if file.document_link else False
     works = WorkLigitation.objects.filter(litigation=file)
+    user = User.objects.get(id=request.user.id)
+    group = Group.objects.get(name="Admin")
+
     data = {
         "file": file,
         "works": works,
         "document_link": document_link,
+        "is_admin": True if group in user.groups.all() else False,
     }
     return render(request, "main/litigation_view_file.html", data)
 
@@ -157,11 +166,14 @@ def nonlitigation_view_file(request, file_id):
     file = NonLitigation.objects.get(id=file_id)
     document_link = True if file.document_link else False
     works = WorkNonLitigation.objects.filter(non_litigation=file)
+    user = User.objects.get(id=request.user.id)
+    group = Group.objects.get(name="Admin")
 
     data = {
         "file": file,
         "works": works,
         "document_link": document_link,
+        "is_admin": True if group in user.groups.all() else False,
     }
     return render(request, "main/nonlitigation_view_file.html", data)
 
@@ -328,3 +340,129 @@ def nonlitigation_mark_unfinished_work(request, work_id):
     work.save()
 
     return redirect(f"/litigation/view/{work.non_litigation.id}#work-{work.id}/")
+
+def litigation_payments(request, file_id):
+    file = Litigation.objects.get(id=file_id)
+    payments = PaymentsLitigation.objects.filter(litigation=file)
+    payments_dates = []
+    for payment in payments:
+        dates = PaymentsLitigationDate.objects.filter(payment=payment)
+        payments_dates.append((payment, dates))
+
+    data = {
+        "file": file,
+        "payments_dates": payments_dates,
+    }
+
+    return render(request, "main/litigation_payments.html", data)
+
+def nonlitigation_payments(request, file_id):
+    file = NonLitigation.objects.get(id=file_id)
+    payments = PaymentsNonLitigation.objects.filter(non_litigation=file)
+    payments_dates = []
+    for payment in payments:
+        dates = PaymentsNonLitigationDate.objects.filter(payment=payment)
+        payments_dates.append((payment, dates))
+
+    data = {
+        "file": file,
+        "payments_dates": payments_dates,
+    }
+
+    return render(request, "main/nonlitigation_payments.html", data)
+
+def litigation_payments_new(request, file_id):
+    if request.method == "POST":
+        file = Litigation.objects.get(id=file_id)
+        name = request.POST["name"]
+        amount = int(request.POST["amount"])
+
+        PaymentsLitigation.objects.create(
+            litigation=file,
+            name=name,
+            amount=amount,
+        )
+
+        return redirect(f"/litigation/payments/{file_id}/")
+    else:
+        file = Litigation.objects.get(id=file_id)
+
+        data = {
+            "file": file,
+            "litigation": True,
+        }
+
+        return render(request, "main/payments_new.html", data)
+    
+def nonlitigation_payments_new(request, file_id):
+    if request.method == "POST":
+        file = NonLitigation.objects.get(id=file_id)
+        name = request.POST["name"]
+        amount = int(request.POST["amount"])
+
+        PaymentsNonLitigation.objects.create(
+            non_litigation=file,
+            name=name,
+            amount=amount,
+        )
+
+        return redirect(f"/nonlitigation/payments/{file_id}/")
+    else:
+        file = NonLitigation.objects.get(id=file_id)
+
+        data = {
+            "file": file,
+            "litigation": False,
+        }
+
+        return render(request, "main/payments_new.html", data)
+    
+def litigation_payments_edit(request, payment_id):
+    if request.method == "POST":
+        payment = PaymentsLitigation.objects.get(id=payment_id)
+        amount_paid = int(request.POST["amount_paid"])
+
+        payment.amount_paid = amount_paid
+        payment.save()
+
+        PaymentsLitigationDate.objects.create(
+            payment=payment,
+            date_paid=datetime.now().date(),
+            amount=amount_paid,
+        )
+
+        return redirect(f"/litigation/payments/{payment.litigation.id}/")
+    else:
+        payment = PaymentsLitigation.objects.get(id=payment_id)
+
+        data = {
+            "litigation": True,
+            "payment": payment,
+        }
+
+        return render(request, "main/payments_edit.html", data)
+    
+def nonlitigation_payments_edit(request, payment_id):
+    if request.method == "POST":
+        payment = PaymentsNonLitigation.objects.get(id=payment_id)
+        amount_paid = int(request.POST["amount_paid"])
+
+        payment.amount_paid = amount_paid
+        payment.save()
+
+        PaymentsNonLitigationDate.objects.create(
+            payment=payment,
+            date_paid=datetime.now().date(),
+            amount=amount_paid,
+        )
+
+        return redirect(f"/nonlitigation/payments/{payment.non_litigation.id}/")
+    else:
+        payment = PaymentsNonLitigation.objects.get(id=payment_id)
+
+        data = {
+            "litigation": False,
+            "payment": payment,
+        }
+
+        return render(request, "main/payments_edit.html", data)

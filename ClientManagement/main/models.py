@@ -102,3 +102,54 @@ class WorkNonLitigation(models.Model):
     def __str__(self) -> str:
         return self.work
 
+class PaymentsLitigation(models.Model):
+    litigation = models.ForeignKey(Litigation, on_delete=models.CASCADE)
+    name = models.CharField(max_length=1000)
+    amount = models.IntegerField()
+    amount_paid = models.IntegerField(default=0)
+    amount_pending = models.IntegerField()
+    total_paid = models.IntegerField(default=0)
+
+    def save(self, *args, **kwards):
+        if not self.pk:
+            self.amount_pending = self.amount
+        self.amount_pending = self.amount_pending - self.amount_paid
+        self.total_paid += self.amount_paid
+        super().save(*args, **kwards)
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.litigation.name}"
+    
+class PaymentsLitigationDate(models.Model):
+    payment = models.ForeignKey(PaymentsLitigation, on_delete=models.CASCADE)
+    date_paid = models.DateField()
+    amount = models.IntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.payment.name} - {self.amount} - {self.date_paid}"
+    
+class PaymentsNonLitigation(models.Model):
+    non_litigation = models.ForeignKey(NonLitigation, on_delete=models.CASCADE)
+    name = models.CharField(max_length=1000)
+    amount = models.IntegerField()
+    amount_paid = models.IntegerField(default=0)
+    amount_pending = models.IntegerField()
+    total_paid = models.IntegerField(default=0)
+
+    def save(self, *args, **kwards):
+        if not self.pk:
+            self.amount_pending = self.amount
+        self.amount_pending = self.amount_pending - self.amount_paid
+        self.total_paid += self.amount_paid
+        super().save(*args, **kwards)
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.non_litigation.name}"
+
+class PaymentsNonLitigationDate(models.Model):
+    payment = models.ForeignKey(PaymentsNonLitigation, on_delete=models.CASCADE)
+    date_paid = models.DateField()
+    amount = models.IntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.payment.name} - {self.amount} - {self.date_paid}"

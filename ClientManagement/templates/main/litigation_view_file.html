@@ -25,24 +25,27 @@
                     </form>
                     {% endif %}
                 </h3>
+                {% if not file.rough_work_pic %}
                 <h3>
-                    {% if not file.rough_work_pic %}
                     <a id="toggle_rough_pic" class="button small">Add Rough Work Pic</a>
                     <form id="rough_pic_form" style="display: none;" action="{% url 'litigation_add_rough_pic' file_id=file.id %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         Rough Work Pic: <input type="file" name="rough_picture" accept="image/jpg, image/png, image/jpeg"><br><br>
                         <input type="submit" class="button small primary" placeholder="Add">
                     </form>
-                    {% endif %}
                 </h3>
+                {% endif %}
+                {% if is_admin %}
+                <a href="{% url 'litigation_payments' file_id=file.id %}" class="button large">Payments</a>
+                {% endif %}
             </div>
+            {% if file.rough_work_pic %}
             <div class="col-6 col-12-xsmall">
-                {% if file.rough_work_pic %}
                 <span class="image main">
                     <img src="{{ file.rough_work_pic.url }}" alt="Rough Work Picture">
                 </span>
-                {% endif %}
             </div>
+            {% endif %}
         </div>
         <hr>
         <h2>Work</h2>

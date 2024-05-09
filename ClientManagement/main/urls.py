@@ -21,4 +21,10 @@ urlpatterns = [
     path("nonlitigation/work/new/stage1/<int:file_id>/", views.nonlitigation_work_stage1_new, name="nonlitigation_work_stage1_new"),
     path("nonlitigation/work/new/stage1/other/<int:file_id>/", views.nonlitigation_work_stage1_other, name="nonlitigation_work_stage1_other"),
     path("nonlitigation/work/new/stage2/<int:file_id>/", views.nonlitigation_work_stage2_new, name="nonlitigation_work_stage2_new"),
+    path("litigation/payments/<int:file_id>/", views.litigation_payments, name="litigation_payments"),
+    path("nonlitigation/payments/<int:file_id>/", views.nonlitigation_payments, name="nonlitigation_payments"),
+    path("litigation/payments/new/<int:file_id>/", views.litigation_payments_new, name="litigation_payments_new"),
+    path("nonlitigation/payments/new/<int:file_id>/", views.nonlitigation_payments_new, name="nonlitigation_payments_new"),
+    path("litigation/payments/edit/<int:payment_id>/", views.litigation_payments_edit, name="litigation_payments_edit"),
+    path("nonlitigation/payments/edit/<int:payment_id>/", views.nonlitigation_payments_edit, name="nonlitigation_payments_edit"),
 ]
