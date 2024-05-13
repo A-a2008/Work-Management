@@ -12,4 +12,5 @@ urlpatterns = [
      path("employee/delete/confirmed/<int:employee_id>/", views.delete_employee, name="delete_employee"),
      path("employee/reverse_status/confirm/<int:employee_id>/", views.reverse_employee_status_confirm, name="reverse_employee_status_confirm"),
      path("employee/reverse_status/<int:employee_id>/", views.reverse_employee_status, name="reverse_employee_status"),
+     path("employee/access/<int:employee_id>/", views.employee_access, name="employee_access"),
 ]

@@ -4,6 +4,7 @@ from django.apps import apps
 from accounts.models import User
 from datetime import datetime, timedelta
 from django.utils import timezone
+from .decorators import login_required, group_required
 
 Litigation = apps.get_model("main", "Litigation")
 WorkLigitation = apps.get_model("main", "WorkLigitation")
@@ -17,8 +18,10 @@ PaymentsNonLitigationDate = apps.get_model("main", "PaymentsNonLitigationDate")
 # Create your views here.
 
 def home(request):
-    return render(request, "generic.html")
+    return render(request, "index.html")
 
+@login_required("login")
+@group_required("Litigation")
 def litigation_new(request):
     if request.method == "POST":
         name = request.POST["name"]
@@ -45,6 +48,8 @@ def litigation_new(request):
     else:
         return render(request, "main/litigation_new.html")
 
+@login_required("login")
+@group_required("Litigation")
 def litigation_view_all(request):
     files = Litigation.objects.all()
     data = {
@@ -52,12 +57,14 @@ def litigation_view_all(request):
     }
     return render(request, "main/litigation_view_all.html", data)
 
+@login_required("login")
+@group_required("Litigation")
 def litigation_view_file(request, file_id): # TODO: Arrange works in reverse order. Both litigation and non litigation
     file = Litigation.objects.get(id=file_id)
     document_link = True if file.document_link else False
     works = WorkLigitation.objects.filter(litigation=file)
     user = User.objects.get(id=request.user.id)
-    group = Group.objects.get(name="Admin")
+    group = Group.objects.get(name="Payments")
 
     data = {
         "file": file,
@@ -67,6 +74,8 @@ def litigation_view_file(request, file_id): # TODO: Arrange works in reverse ord
     }
     return render(request, "main/litigation_view_file.html", data)
 
+@login_required("login")
+@group_required("Litigation")
 def litigation_file_add_document_link(request, file_id):
     file = Litigation.objects.get(id=file_id)
     file.document_link = request.POST["document_link"]
@@ -74,6 +83,8 @@ def litigation_file_add_document_link(request, file_id):
 
     return redirect(f"/litigation/view/{file_id}")
 
+@login_required("login")
+@group_required("Litigation")
 def litigation_work_new(request, file_id):
     if request.method == 'POST':
         litigation = Litigation.objects.get(id=file_id)
@@ -106,6 +117,8 @@ def litigation_work_new(request, file_id):
         }
         return render(request, "main/litigation_work_new.html", data)
     
+@login_required("login")
+@group_required("Litigation")
 def litigation_add_rough_pic(request, file_id):
     file = Litigation.objects.get(id=file_id)
     file.rough_work_pic=request.FILES.get("rough_picture")
@@ -113,6 +126,8 @@ def litigation_add_rough_pic(request, file_id):
 
     return redirect(f"/litigation/view/{file_id}/")
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_new(request):
     if request.method == 'POST':
         name = request.POST["name"]
@@ -155,6 +170,8 @@ def nonlitigation_new(request):
     else:
         return render(request, "main/nonlitigation_new.html")
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_view_all(request):
     files = NonLitigation.objects.all()
     data = {
@@ -162,12 +179,14 @@ def nonlitigation_view_all(request):
     }
     return render(request, "main/nonlitigation_view_all.html", data)
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_view_file(request, file_id):
     file = NonLitigation.objects.get(id=file_id)
     document_link = True if file.document_link else False
     works = WorkNonLitigation.objects.filter(non_litigation=file)
     user = User.objects.get(id=request.user.id)
-    group = Group.objects.get(name="Admin")
+    group = Group.objects.get(name="Payments")
 
     data = {
         "file": file,
@@ -177,6 +196,8 @@ def nonlitigation_view_file(request, file_id):
     }
     return render(request, "main/nonlitigation_view_file.html", data)
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_file_add_document_link(request, file_id):
     file = NonLitigation.objects.get(id=file_id)
     file.document_link = request.POST["document_link"]
@@ -184,6 +205,8 @@ def nonlitigation_file_add_document_link(request, file_id):
 
     return redirect(f"/nonlitigation/view/{file_id}")
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_add_rough_pic(request, file_id):
     file = NonLitigation.objects.get(id=file_id)
     file.rough_work_pic=request.FILES.get("rough_picture")
@@ -191,6 +214,8 @@ def nonlitigation_add_rough_pic(request, file_id):
 
     return redirect(f"/nonlitigation/view/{file_id}/")
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_work_stage1_new(request, file_id):
     file = NonLitigation.objects.get(id=file_id)
     work = request.POST["work"]
@@ -211,6 +236,8 @@ def nonlitigation_work_stage1_new(request, file_id):
 
     return redirect(f"/nonlitigation/view/{file_id}/")
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_work_stage1_other(request, file_id):
     if request.method == "POST":
         file = NonLitigation.objects.get(id=file_id)
@@ -265,6 +292,8 @@ def nonlitigation_work_stage1_other(request, file_id):
 
         return render(request, "main/nonlitigation_work_new.html", data)
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_work_stage2_new(request, file_id):
     if request.method == "POST":
         file = NonLitigation.objects.get(id=file_id)
@@ -299,6 +328,8 @@ def nonlitigation_work_stage2_new(request, file_id):
 
         return render(request, "main/nonlitigation_work_new.html", data)
 
+@login_required("login")
+@group_required("Litigation")
 def litigation_finished_work(request, work_id):
     work = WorkLigitation.objects.get(id=work_id)
     work.finished = True
@@ -311,6 +342,8 @@ def litigation_finished_work(request, work_id):
 
     return redirect(f"/litigation/view/{work.litigation.id}#work-{work.id}/")
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_finished_work(request, work_id):
     work = WorkNonLitigation.objects.get(id=work_id)
     work.finished = True
@@ -323,6 +356,8 @@ def nonlitigation_finished_work(request, work_id):
 
     return redirect(f"/nonlitigation/view/{work.non_litigation.id}#work-{work.id}/")
 
+@login_required("login")
+@group_required("Litigation")
 def litigation_mark_unfinished_work(request, work_id):
     work = WorkLigitation.objects.get(id=work_id)
     work.finished = False
@@ -332,6 +367,8 @@ def litigation_mark_unfinished_work(request, work_id):
 
     return redirect(f"/litigation/view/{work.litigation.id}#work-{work.id}/")
 
+@login_required("login")
+@group_required("Non Litigation")
 def nonlitigation_mark_unfinished_work(request, work_id):
     work = WorkNonLitigation.objects.get(id=work_id)
     work.finished = False
@@ -341,6 +378,7 @@ def nonlitigation_mark_unfinished_work(request, work_id):
 
     return redirect(f"/litigation/view/{work.non_litigation.id}#work-{work.id}/")
 
+@group_required("Payments")
 def litigation_payments(request, file_id):
     file = Litigation.objects.get(id=file_id)
     payments = PaymentsLitigation.objects.filter(litigation=file)
@@ -356,6 +394,7 @@ def litigation_payments(request, file_id):
 
     return render(request, "main/litigation_payments.html", data)
 
+@group_required("Payments")
 def nonlitigation_payments(request, file_id):
     file = NonLitigation.objects.get(id=file_id)
     payments = PaymentsNonLitigation.objects.filter(non_litigation=file)
@@ -371,6 +410,7 @@ def nonlitigation_payments(request, file_id):
 
     return render(request, "main/nonlitigation_payments.html", data)
 
+@group_required("Payments")
 def litigation_payments_new(request, file_id):
     if request.method == "POST":
         file = Litigation.objects.get(id=file_id)
@@ -394,6 +434,7 @@ def litigation_payments_new(request, file_id):
 
         return render(request, "main/payments_new.html", data)
     
+@group_required("Payments")
 def nonlitigation_payments_new(request, file_id):
     if request.method == "POST":
         file = NonLitigation.objects.get(id=file_id)
@@ -417,6 +458,7 @@ def nonlitigation_payments_new(request, file_id):
 
         return render(request, "main/payments_new.html", data)
     
+@group_required("Payments")
 def litigation_payments_edit(request, payment_id):
     if request.method == "POST":
         payment = PaymentsLitigation.objects.get(id=payment_id)
@@ -442,6 +484,7 @@ def litigation_payments_edit(request, payment_id):
 
         return render(request, "main/payments_edit.html", data)
     
+@group_required("Payments")
 def nonlitigation_payments_edit(request, payment_id):
     if request.method == "POST":
         payment = PaymentsNonLitigation.objects.get(id=payment_id)
@@ -466,3 +509,8 @@ def nonlitigation_payments_edit(request, payment_id):
         }
 
         return render(request, "main/payments_edit.html", data)
+    
+
+# Errors
+def no_access(request):
+    return render(request, "errors/group.html")

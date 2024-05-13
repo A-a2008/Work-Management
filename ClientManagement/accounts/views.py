@@ -19,20 +19,16 @@ def register(request):
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
-        phone_number = request.POST['phone_number']
+        telegram_name = request.POST['telegram_name']
 
-        is_ph_no = False
-        if len(phone_number) == 10:
-            is_ph_no = True
-
-        if password1 == password2 and is_ph_no:
+        if password1 == password2:
             if not User.objects.filter(username=username).exists() and not User.objects.filter(email=email).exists():
                 user = User.objects.create_user(username=username,
                                                 email=email,
                                                 password=password1,
                                                 first_name=first_name,
                                                 last_name=last_name,
-                                                phone_number=phone_number)
+                                                telegram_name=telegram_name)
                 group = Group.objects.get(name="Employees")
                 user.groups.add(group)
                 user.save()
@@ -40,7 +36,7 @@ def register(request):
                     'name': first_name + " " + last_name,
                     'username': username,
                     'email': email,
-                    'phone_number': phone_number,
+                    'telegram_name': telegram_name,
                 }
                 user = auth.authenticate(username=username, password=password1)
                 auth.login(request, user)
@@ -57,10 +53,6 @@ def register(request):
 
         elif password1 != password2:
             messages.info(request, "Passwords not matching")
-            return render(request, 'accounts/register.html')
-        
-        elif not is_ph_no:
-            messages.info(request, "Phone number is not 10 digit. Please check the phone number again. Make sure <b>not</b> to include country code. Eg. +91")
             return render(request, 'accounts/register.html')
 
     else:
@@ -186,3 +178,44 @@ def reverse_employee_status(request, employee_id):
         employee.is_superuser = True
     employee.save()
     return redirect('view_employees')
+
+def employee_access(request, employee_id):
+    if request.method == "POST":
+        litigation = True if request.POST.get("litigation") else False
+        nonlitigation = True if request.POST.get("nonlitigation") else False
+        admin = True if request.POST.get("admin") else False
+
+        employee = User.objects.get(id=employee_id)
+
+        group = Group.objects.get(name="Litigation")
+        if litigation:
+            employee.groups.add(group)
+        else:
+            employee.groups.remove(group)
+
+        group = Group.objects.get(name="Non Litigation")
+        if nonlitigation:
+            employee.groups.add(group)
+        else:
+            employee.groups.remove(group)
+        
+        if admin:
+            employee.is_superuser = True
+        else:
+            employee.is_superuser = False
+        employee.save()
+
+        return redirect("view_employees")
+    else:
+        employee = User.objects.get(id=employee_id)
+        litigation_group = Group.objects.get(name="Litigation")
+        nonlitigation_group = Group.objects.get(name="Non Litigation")
+
+        data = {
+            "employee": employee,
+            "litigation": True if litigation_group in employee.groups.all() else False,
+            "nonlitigation": True if nonlitigation_group in employee.groups.all() else False,
+            "admin": True if employee.is_superuser else False,
+        }
+
+        return render(request, "accounts/access_view.html", data)

@@ -27,4 +27,7 @@ urlpatterns = [
     path("nonlitigation/payments/new/<int:file_id>/", views.nonlitigation_payments_new, name="nonlitigation_payments_new"),
     path("litigation/payments/edit/<int:payment_id>/", views.litigation_payments_edit, name="litigation_payments_edit"),
     path("nonlitigation/payments/edit/<int:payment_id>/", views.nonlitigation_payments_edit, name="nonlitigation_payments_edit"),
+
+    # Errors
+    path("no_access/", views.no_access, name="no_access"),
 ]

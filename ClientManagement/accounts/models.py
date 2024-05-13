@@ -4,6 +4,6 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class User(AbstractUser):
-    phone_number = models.CharField(max_length=12)
-    # add telegram_user_id is possible, then go admin page and also add that
+    telegram_name = models.CharField(max_length=1000, default="")
+    telegram_user_id = models.CharField(max_length=50, null=True)
 

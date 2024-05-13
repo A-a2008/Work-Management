@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Employee</h1>
+        <h2>Update access of '{{ employee.first_name }} {{ employee.last_name }}'</h2>
+    </header>
+    <p>
+        Please tick the required permissions:
+        <form action="{% url 'employee_access' employee_id=employee.id %}" method="post">
+            {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-4 col-4-xsmall">
+                    <input type="checkbox" id="litigation" name="litigation" {% if litigation %}checked{% endif %}>
+                    <label for="litigation">Litigattion</label>
+                </div>
+                <div class="col-4 col-4-xsmall">
+                    <input type="checkbox" id="nonlitigation" name="nonlitigation" {% if nonlitigation %}checked{% endif %}>
+                    <label for="nonlitigation">Non Litigation</label>
+                </div>
+                <div class="col-4 col-4-xsmall">
+                    <input type="checkbox" id="admin" name="admin" {% if admin %}checked{% endif %}>
+                    <label for="admin">Admin</label>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" value="Update" class="primary"> <input type="reset">
+                </div>
+            </div>
+        </form>
+    </p>
+</section>
+{% endblock %}

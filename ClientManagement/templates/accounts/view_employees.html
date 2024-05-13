@@ -19,14 +19,14 @@
                             <a href="{% url 'delete_employee_confirm' employee_id=employee.id %}" class="button small">Delete</a>
                         </td>
                         <td class="align-right">
-                            
-                            <a href="{% url 'reverse_employee_status_confirm' employee_id=employee.id %}" class="button small">
+                            <a href="{% url 'employee_access' employee_id=employee.id %}" class="button small">Access</a>
+                            <!-- <a href="{% url 'reverse_employee_status_confirm' employee_id=employee.id %}" class="button small">
                                 {% if employee.is_superuser %}
                                 Remove as Admin
                                 {% else %}
                                 Make as Admin
                                 {% endif %}
-                            </a>
+                            </a> -->
                         </td>
                         {% endif %}
                     </tr>
