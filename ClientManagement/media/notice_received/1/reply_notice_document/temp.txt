@@ -1,0 +1,3 @@
+record book, observation book, lab coat, math book (allen), whitener
+
+assignments - computer, chemistry, physics, maths

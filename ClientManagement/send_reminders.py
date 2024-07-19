@@ -1,5 +1,6 @@
 import django
 import os
+from datetime import datetime, timedelta
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ClientManagement.settings')
 django.setup()
 
@@ -18,6 +19,7 @@ Litigation = apps.get_model("main", "Litigation")
 WorkLigitation = apps.get_model("main", "WorkLigitation")
 NonLitigation = apps.get_model("main", "NonLitigation")
 WorkNonLitigation = apps.get_model("main", "WorkNonLitigation")
+NoticeReceived = apps.get_model("main", "NoticeReceived")
 User = apps.get_model("accounts", "User")
 
 def sort_works_incomplete():
@@ -44,6 +46,26 @@ def sort_works_incomplete():
         {"id": work.id, "type": type(work).__name__}
         for work in sorted_works
     ]
+
+    # Calculate the date range for the reminders
+    notice_reminder_start_date = current_date
+    noticer_reminder_end_date = current_date + timedelta(days=10)
+    
+    # Filter NoticeReceived objects
+    notice_received_objects = NoticeReceived.objects.filter(
+        type="NI",
+        ni_deadline__range=[notice_reminder_start_date, noticer_reminder_end_date],
+        completed=False
+    )
+    
+    # Convert NoticeReceived objects to the same dictionary format
+    notice_received_dicts = [
+        {"id": notice.id, "type": "NoticeNI"}
+        for notice in notice_received_objects
+    ]
+    
+    # Extend the sorted works with NoticeReceived dictionaries
+    sorted_works_dicts.extend(notice_received_dicts)
     
     return sorted_works_dicts
 
@@ -74,7 +96,7 @@ def remind_litigation():
         if incomplete_work["type"] == "WorkLigitation":
             work = WorkLigitation.objects.get(id=incomplete_work["id"])
             litigation = Litigation.objects.get(id=work.litigation.id)
-            current_message = message.format(employee_name=work.to_name, case_name=litigation.name, work=work.work, work_details=work.details if work.details else 'Not Provided', completion_date=work.completion_date, link=f"http://127.0.0.1:8000/litigation/view/{litigation.id}/")
+            current_message = message.format(employee_name=work.to_name, case_name=litigation.name, work=work.work, work_details=work.details if work.details else 'Not Provided', completion_date=work.completion_date, link=f"http://127.0.0.1:8000/litigation/view/{litigation.id}/") # TODO: Change in production (below also)
         
             asyncio.run(send_message(text=current_message, group_id=group_id))
 
@@ -88,6 +110,22 @@ def remind_nonlitigation():
             current_message = message.format(employee_name=work.to_name, case_name=nonlitigation.name, work=work.work, work_details=work.details if work.details else 'Not Provided', completion_date=work.completion_date, link=f"http://127.0.0.1:8000/nonlitigation/view/{nonlitigation.id}/")
         
             asyncio.run(send_message(text=current_message, group_id=group_id))
+
+
+def remind_notices():
+    works_incomplete = sort_works_incomplete()
+    for incomplete_work in works_incomplete:
+        if incomplete_work["type"] == "NoticeNI":
+            notice = NoticeReceived.objects.get(id=incomplete_work["id"])
+            message = f"""{notice.received_employee_name}, you have a pending work.
+Details:
+NI Notice deadline nearing
+Notice: {notice.name}
+Notice Deadline: {notice.ni_deadline}
+Today's Date: {datetime.now().strftime("%d-%m-%Y")}
+"""
+        
+            asyncio.run(send_message(text=message, group_id=group_id))
 
 
 async def new_member_handler(update, context):
@@ -109,6 +147,7 @@ async def new_member_handler(update, context):
 def schedule_reminders():
     reminder_times_litigation = ["09:30", "15:00", "18:30"]
     reminder_times_nonlitigation = ["19:30"]
+    reminder_times_notice = ["16:00", "19:30"]
 
     while True:
         current_time = datetime.now().strftime("%H:%M")
@@ -117,6 +156,9 @@ def schedule_reminders():
 
         if current_time in reminder_times_nonlitigation:
             threading.Thread(target=remind_nonlitigation).start()
+
+        if current_time in reminder_times_notice:
+            threading.Thread(target=remind_notices).start()
 
         time.sleep(5)
 

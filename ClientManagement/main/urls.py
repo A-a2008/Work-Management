@@ -27,6 +27,22 @@ urlpatterns = [
     path("nonlitigation/payments/new/<int:file_id>/", views.nonlitigation_payments_new, name="nonlitigation_payments_new"),
     path("litigation/payments/edit/<int:payment_id>/", views.litigation_payments_edit, name="litigation_payments_edit"),
     path("nonlitigation/payments/edit/<int:payment_id>/", views.nonlitigation_payments_edit, name="nonlitigation_payments_edit"),
+    path("notices/view/", views.notices_view_all, name="notices_view_all"),
+    path("notices/new/choice/", views.notices_create_choices, name="notices_create_choices"),
+    path("notices/new/sent/", views.notices_new_sent, name="notices_new_sent"),
+    path("notices/new/received/", views.notices_new_received, name="notices_new_received"),
+    path("notices/view/sent/<int:notice_id>/", views.notices_view_sent_notice, name="notices_view_sent_notice"),
+    path("notices/update/sent/add_notice_document/<int:notice_id>/", views.notices_view_sent_notice_add_notice_document, name="notices_view_sent_notice_add_notice_document"),
+    path("notices/update/sent/add_sent_date/<int:notice_id>/", views.notices_view_sent_notice_add_sent_date, name="notices_view_sent_notice_add_sent_date"),
+    path("notices/update/sent/add_tracking_number/<int:notice_id>/", views.notices_view_sent_notice_add_tracking_number, name="notices_view_sent_notice_add_tracking_number"),
+    path("notices/update/sent/add_acknowledgement_details/<int:notice_id>/", views.notices_view_sent_notice_add_acknowledgement_details, name="notices_view_sent_notice_add_acknowledgement_details"),
+    path("notices/update/sent/completed/<int:notice_id>/", views.notices_view_sent_notice_completed, name="notices_view_sent_notice_completed"),
+    path("notices/view/received/<int:notice_id>/", views.notices_view_received, name="notices_view_received"),
+    path("notices/update/received/add_reply_notice_document/<int:notice_id>/", views.notices_view_received_add_reply_notice, name="notices_view_received_add_reply_notice"),
+    path("notices/update/received/completed/<int:notice_id>/", views.notices_view_received_completed, name="notices_view_received_completed"),
+    path("notices/sent_to_litigation/<int:notice_id>/", views.notices_sent_transfer, name="notices_sent_transfer"),
+    path("notices/received_to_litigation/<int:notice_id>/", views.notices_received_transfer, name="notices_received_transfer"),
+
 
     # Errors
     path("no_access/", views.no_access, name="no_access"),

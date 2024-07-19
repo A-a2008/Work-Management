@@ -19,7 +19,7 @@
 
 							<!-- Content -->
 							{% block content %}
-
+							
 							{% endblock %}
 						</div>
 					</div>
@@ -29,37 +29,59 @@
 					<div class="inner">
 
 						<!-- Menu -->
-							<nav id="menu">
-								<header class="major">
-									<h2>Menu</h2>
-								</header>
-								<ul>
-									<li><a href="/">Home</a></li>
-									{% if user.is_authenticated %}
-									<li>
-										<span class="opener">Litigation</span>
-										<ul>
-											<li><a href="{% url 'litigation_new' %}">Add new file</a></li>
-											<li><a href="{% url 'litigation_view_all' %}">View Files</a></li>
-										</ul>
-									</li>
-									<li>
-										<span class="opener">Non Litigation</span>
-										<ul>
-											<li><a href="{% url 'nonlitigation_new' %}">Add new file</a></li>
-											<li><a href="{% url 'nonlitigation_view_all' %}">View Files</a></li>
-										</ul>
-									</li>
-									<li>
-										<span class="opener">Hi {{ user.first_name }}</span>
-										<ul>
-											<li><a href="{% url 'logout' %}">Logout</a></li>
-											<li><a href="{% url 'verify_email' %}">Change Password</a></li>
-										</ul>
-									</li>
-									{% endif %}
-								</ul>
-							</nav>
+						<nav id="menu">
+							<header class="major">
+								<h2>Menu</h2>
+							</header>
+							<ul>
+								<li><a href="/">Home</a></li>
+								{% if user.is_authenticated %}
+								{% if litigation_ %}
+								<li>
+									<span class="opener">Litigation</span>
+									<ul>
+										<li><a href="{% url 'litigation_view_all' %}">View Files</a></li>
+										<li><a href="{% url 'litigation_new' %}">Add new file</a></li>
+									</ul>
+								</li>
+								{% endif %}
+								{% if nonlitigation_ %}
+								<li>
+									<span class="opener">Non Litigation</span>
+									<ul>
+										<li><a href="{% url 'nonlitigation_view_all' %}">View Files</a></li>
+										<li><a href="{% url 'nonlitigation_new' %}">Add new file</a></li>
+									</ul>
+								</li>
+								{% endif %}
+								{% if litigation_ %}
+								<li>
+									<span class="opener">Notices</span>
+									<ul>
+										<li><a href="{% url 'notices_view_all' %}">View Notices</a></li>
+										<li>
+											<span class="opener">New Notice</span>
+											<ul>
+												<li><a href="{% url 'notices_new_sent' %}">Send</a></li>
+												<li><a href="">Received</a></li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								{% endif %}
+								<li>
+									<span class="opener">Hi {{ user.first_name }}</span>
+									<ul>
+										<li><a href="{% url 'logout' %}">Logout</a></li>
+										{% if user.is_superuser %}
+										<li><a href="/admin" target="_blank">Admin Page</a>
+										{% endif %}
+										<li><a href="{% url 'verify_email' %}">Change Password</a></li>
+									</ul>
+								</li>
+								{% endif %}
+							</ul>
+						</nav>
 
 					</div>
 				</div>
@@ -72,6 +94,16 @@
 			<script src="{% static 'assets/js/breakpoints.min.js' %}"></script>
 			<script src="{% static 'assets/js/util.js' %}"></script>
 			<script src="{% static 'assets/js/main.js' %}"></script>
+			<script>
+				document.addEventListener("DOMContentLoaded", function() {
+					var submitButtons = document.querySelectorAll('input[type="submit"]');
+					submitButtons.forEach(function(button) {
+						if (!button.value) {
+							button.value = "Submit";
+						}
+					});
+				});
+			</script>
 
 	</body>
 </html>

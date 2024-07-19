@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import User
+import os
 
 # Create your models here.
 
@@ -153,3 +154,121 @@ class PaymentsNonLitigationDate(models.Model):
 
     def __str__(self) -> str:
         return f"{self.payment.name} - {self.amount} - {self.date_paid}"
+
+class NoticeSent(models.Model):
+    acknowledgement_choices = [
+        ("Received", "Received"),
+        ("Refused", "Refused"),
+        ("Address not Found", "Address not Found"),
+        ("Addressee Left", "Addressee Left"),
+        ("Door Locked", "Door Locked"),
+        ("Informed to sender", "Informed to sender"),
+        ("Not claimed", "Not claimed"),
+        ("Addressee cannot be located", "Addressee cannot be located"),
+        ("Lost in transit", "Lost in transit"),
+        ("Insufficient Address", "Insufficient Address"),
+        ("No such person", "No such person"),
+        ("Deceased", "Deceased"),
+    ]
+    name = models.CharField(max_length=1000)
+    completion_date = models.DateField()
+    acknowledgement = models.CharField(max_length=100, choices=acknowledgement_choices, null=True)
+    acknowledgement_received_date = models.DateField(null=True)
+    tracking_number = models.CharField(max_length=500, null=True)
+    notice_document = models.FileField(upload_to=f"notice_sent/", null=True)
+    sent_date = models.DateField(null=True)
+    reply_notice_given = models.BooleanField(default=False)
+    completed = models.BooleanField(default=False)
+
+    def notice_type(self) -> str:
+        return "Sent"
+    
+    def notice_file_name(self):
+        return os.path.basename(self.notice_document.name)
+    
+    def __str__(self):
+        return self.name
+
+class NoticeSentRejoinder(models.Model):
+    notice_sent = models.ForeignKey(NoticeSent, on_delete=models.CASCADE)
+    acknowledgement_choices = [
+        ("Received", "Received"),
+        ("Refused", "Refused"),
+        ("Address not Found", "Address not Found"),
+        ("Addressee Left", "Addressee Left"),
+        ("Door Locked", "Door Locked"),
+        ("Informed to sender", "Informed to sender"),
+        ("Not claimed", "Not claimed"),
+        ("Addressee cannot be located", "Addressee cannot be located"),
+        ("Lost in transit", "Lost in transit"),
+        ("Insufficient Address", "Insufficient Address"),
+        ("No such person", "No such person"),
+        ("Deceased", "Deceased"),
+    ]
+    acknowledgement = models.CharField(max_length=100, choices=acknowledgement_choices, null=True)
+    acknowledgement_received_date = models.DateField(null=True)
+    notice_document = models.FileField(upload_to=f"notice_sent/", null=True)
+    sent_date = models.DateField()
+    reply_notice_given = models.BooleanField(default=False)
+
+class NoticeSentReply(models.Model):
+    notice_sent = models.ForeignKey(NoticeSent, on_delete=models.CASCADE)
+    reply_notice_document = models.FileField(upload_to=f"notice_sent/", null=True)
+    sent_date = models.DateField()
+
+class NoticeReceived(models.Model):
+    type_choices = [
+        ("MC", "MC"),
+        ("OS", "OS"),
+        ("NI", "NI"),
+        ("Consumer", "Consumer"),
+    ]
+    name = models.CharField(max_length=1000)
+    type = models.CharField(max_length=50, choices=type_choices)
+    received_date_client = models.DateField()
+    received_date_office = models.DateField()
+    received_employee = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'groups__name': 'Employees'})
+    received_employee_name = models.CharField(max_length=255, blank=True, null=True)
+    completion_date = models.DateField()
+    reply_notice_sent = models.BooleanField(default=False)
+    reply_notice_sent_date = models.DateField(null=True)
+    reply_notice_document = models.FileField(upload_to=f"notice_received/", null=True)
+    ni_deadline = models.DateField(null=True) # TODO: Add way to send reminder for this.
+    completed = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return self.name
+    
+    def reply_notice_file_name(self):
+        return os.path.basename(self.reply_notice_document.name)
+    
+    def notice_type(self) -> str:
+        return "Recieved"
+    
+    def save(self, *args, **kwargs):
+        if self.received_employee:
+            self.received_employee_name = f"{self.received_employee.first_name} {self.received_employee.last_name}"
+        super().save(*args, **kwargs)
+    
+class NoticeReceivedRejoinder(models.Model):
+    notice_received = models.ForeignKey(NoticeReceived, on_delete=models.CASCADE)
+    acknowledgement_choices = [
+        ("Received", "Received"),
+        ("Refused", "Refused"),
+        ("Address not Found", "Address not Found"),
+        ("Addressee Left", "Addressee Left"),
+        ("Door Locked", "Door Locked"),
+        ("Informed to sender", "Informed to sender"),
+        ("Not claimed", "Not claimed"),
+        ("Addressee cannot be located", "Addressee cannot be located"),
+        ("Lost in transit", "Lost in transit"),
+        ("Insufficient Address", "Insufficient Address"),
+        ("No such person", "No such person"),
+        ("Deceased", "Deceased"),
+    ]
+    acknowledgement = models.CharField(max_length=100, choices=acknowledgement_choices, null=True)
+    acknowledgement_received_date = models.DateField(null=True)
+    notice_document = models.FileField(upload_to=f"notice_received/", null=True)
+    sent_date = models.DateField()
+    reply_notice_given = models.BooleanField(default=False)
+

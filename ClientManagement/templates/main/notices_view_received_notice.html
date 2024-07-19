@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Notices (Received)</h1>
+        <h2>View and edit this notice</h2>
+    </header>
+    <p>
+        <div class="work row gtr-uniform">
+            <div class="col-12 col-12-xsmall">
+                Name: <b>{{ notice.name }}</b><br>
+                Type: <b>{{ notice.type }}</b>
+            </div>
+            {% if notice.type == "NI" %}
+            <div class="col-12 col-12-xsmall">
+                NI deadline: <b>{{ notice.ni_deadline }}</b>
+            </div>
+            {% endif %}
+            <div class="col-6 col-6-xsmall">
+                Notice received by client: <b>{{ notice.received_date_client }}</b>
+            </div>
+            <div class="col-6 col-6-xsmall">
+                Notice received by office: <b>{{ notice.received_date_office }}</b>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                Received by <b>{{ notice.received_employee_name }}</b>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                Completion Date: <b>{{ notice.completion_date }}</b>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                {% if notice.reply_notice_sent %}
+                <a href="{{ notice.reply_notice_document.url }}" class="button small" download>Download Document - {{ notice.reply_notice_file_name }}</a>
+                <a class="button small primary" id="add_reply_notice_button">Change</a>
+                {% else %}
+                <a class="button small" id="add_reply_notice_button">Add Reply Notice Document</a>
+                {% endif %}
+                <form id="add_reply_notice" action="{% url 'notices_view_received_add_reply_notice' notice_id=notice.id %}" method="post" enctype="multipart/form-data" style="display: none;">
+                    {% csrf_token %}
+                    <div class="row gtr-uniform">
+                        <div class="col-12 col-12-xsmall">
+                            <input type="file" name="reply_notice_document" placeholder="Add Reply..." required>
+                        </div>
+                        <div class="col-12 col-12-xsmall">
+                            <input type="submit" class="small primary">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                <a href="{% url 'notices_view_received_completed' notice_id=notice.id %}" 
+                class="{% if not notice.completed %}button primary{% else %}small button{% endif %}">
+                    {% if not notice.completed %}
+                    Complete
+                    {% else %}
+                    Re-open
+                    {% endif %}
+                </a>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                <a href="{% url 'notices_received_transfer' notice_id=notice.id %}" class="button small">Transfer to Lititgation</a>
+            </div>
+        </div>
+    </p>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleLink = document.getElementById('add_reply_notice_button');
+        var form = document.getElementById('add_reply_notice');
+        toggleLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+    
+            // Toggle form visibility
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                toggleLink.style.display = 'none'; // Hide the link when form is shown
+            } else {
+                form.style.display = 'none';
+                toggleLink.style.display = 'inline'; // Show the link when form is hidden
+            }
+        });
+    });
+</script>
+{% endblock %}

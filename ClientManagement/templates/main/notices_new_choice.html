@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Notices</h1>
+        <h2>Choose the type of notice to create</h2>
+    </header>
+    <p>
+        <a href="{% url 'notices_new_sent' %}" class="button large">Sending a Notice</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{% url 'notices_new_received' %}" class="button large">Receiving a Notice</a>
+    </p>
+</section>
+{% endblock %}

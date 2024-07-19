@@ -3,26 +3,34 @@
 {% block content %}
 <section>
     <header class="main">
-        <h1>Litigation</h1>
-        <h2>View all Litigation files here. Click to view more details</h2>
+        <h1>Notices</h1>
+        <h2>View all Notices here. Click to view more details</h2>
     </header>
     <p>
-        <a href="{% url 'litigation_new' %}" class="button">Create New</a><br><br>
+        <a href="{% url 'notices_create_choices' %}" class="button">Create New</a><br><br>
         <input type="text" id="search_input" placeholder="Search..." >
-        {% if files %}
+        {% if notices %}
         <div class="table-wrapper">
-            <table id="cases">
+            <table id="all_notices">
                 <thead>
                     <tr>
-                        <th>File</th>
-                        <th>Case Number</th>
+                        <th>Name</th>
+                        <th>Completion Date</th>
+                        <th>Type</th>
+                        <th>Completed</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for file in files %}
+                    {% for notice in notices %}
                     <tr>
-                        <td><a href="{% url 'litigation_view_file' file_id=file.id %}">{{ file }}</a></td>
-                        <td>{{ file.case_number }}</td>
+                        {% if notice.notice_type == 'Sent' %}
+                        <td><a href="{% url 'notices_view_sent_notice' notice_id=notice.id %}">{{ notice }}</a></td>
+                        {% else %}
+                        <td><a href="{% url 'notices_view_received' notice_id=notice.id %}">{{ notice }}</a></td>
+                        {% endif %}
+                        <td>{{ notice.completion_date }}</td>
+                        <td>{{ notice.notice_type }}</td>
+                        <td>{% if notice.completed %}Yes{% else %}<b>No</b>{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -30,7 +38,7 @@
         </div>
         {% else %}
         <br>
-        No cases created yet.
+        No notices created yet.
         {% endif %}
         <p id="no_result" style="display: none;">No results found!</p>
     </p>
@@ -40,7 +48,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Get the input element, table, and no results message
     var input = document.getElementById('search_input');
-    var table = document.getElementById('cases');
+    var table = document.getElementById('all_notices');
     var noResults = document.getElementById('no_result');
 
     // Add event listener for input

@@ -50,3 +50,43 @@ employee assessment
 
 - check whether file is present or not.
 - notices
+
+outsourcing support.
+
+notices (sent):
+Client name.
+
+Completion date.
+
+Sent date.
+
+Acknowledgment received: received, refused, address not found, addresse left, door locked, intimation served, item returned unclaimed, addresse cannot be located, lost in transit.
+Received date.
+
+Reply notice, given or not given.
+
+(add option to reply for the given reply)
+
++ add rejoinder of notice (add above details)
+
+
+notices (received):
+Client Name.
+Type: MC, OS, NI, Consumer
+
+Notice received date (client)
+Received (employee)
+Completion Date.
+
+Acknowledgment received: received, refused, address not found, addresse left, door locked, intimation served, item returned unclaimed, addresse cannot be located, lost in transit.
+Received date.
+
+Reply notice, given or not given.
+
+(add option to reply for the given reply)
+
++ add rejoinder of notice (add above details)
+
+
+tracking number
+NI - deadline

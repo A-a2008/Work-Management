@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Notices (Received)</h1>
+        <h2>Fill the details to create a notice which was received</h2>
+    </header>
+    <p>
+        {% if error_message %}
+        <p class="error">{{ error_message }}</p>
+        {% endif %}
+        <form action="{% url 'notices_new_received' %}" method="post">
+            {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-6 col-12-xsmall">
+                    Client Name: <input type="text" name="name" placeholder="Name" required>
+                </div>
+                <div class="col-6 col-12-xsmall">
+                    Type: <select name="type" id="type_select" required>
+                        <option selected disabled>Select</option>
+                        <option value="MC">MC</option>
+                        <option value="OS">OS</option>
+                        <option value="NI">NI</option>
+                        <option value="Consumer">Consumer</option>
+                    </select>
+                </div>
+                <div class="col-12 col-12-xsmall" id="NI_deadline" style="display: none;">
+                    NI Deadline: <input type="date" name="ni_deadline" value="{{ ni_deadline }}" id="ni_deadline">
+                </div>
+                <div class="col-6 col-6-xsmall">
+                    The date when client received the notice: <input type="date" name="received_date_client" required>
+                </div>
+                <div class="col-6 col-6-xsmall">
+                    The date when office received the notice: <input type="date" name="received_date_office" value="{{ office_received_date }}" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Received employee: <select name="received_employee" required>
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Completion Date: <input type="date" name="completion_date" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" value="Create"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="reset" value="Reset">
+                </div>
+            </div>
+        </form>
+    </p>
+</section>
+
+<script>
+    document.getElementById('type_select').addEventListener('change', function() {
+        var niDeadlineDiv = document.getElementById('NI_deadline');
+        var deadlineInput = document.getElementById('ni_deadline');
+        
+        if (this.value === 'NI') {
+            niDeadlineDiv.style.display = 'block';
+            deadlineInput.setAttribute('required', 'required');
+        } else {
+            niDeadlineDiv.style.display = 'none';
+            deadlineInput.removeAttribute('required');
+        }
+    });
+</script>
+
+{% endblock %}

@@ -5,6 +5,8 @@ from accounts.models import User
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .decorators import login_required, group_required
+from itertools import chain
+from operator import attrgetter
 
 Litigation = apps.get_model("main", "Litigation")
 WorkLigitation = apps.get_model("main", "WorkLigitation")
@@ -14,6 +16,11 @@ PaymentsLitigation = apps.get_model("main", "PaymentsLitigation")
 PaymentsNonLitigation = apps.get_model("main", "PaymentsNonLitigation")
 PaymentsLitigationDate = apps.get_model("main", "PaymentsLitigationDate")
 PaymentsNonLitigationDate = apps.get_model("main", "PaymentsNonLitigationDate")
+NoticeSent = apps.get_model("main", "NoticeSent")
+NoticeSentRejoinder = apps.get_model("main", "NoticeSentRejoinder")
+NoticeSentReply = apps.get_model("main", "NoticeSentReply")
+NoticeReceived = apps.get_model("main", "NoticeReceived")
+NoticeReceivedRejoinder = apps.get_model("main", "NoticeReceivedRejoinder")
 
 # Create your views here.
 
@@ -62,7 +69,7 @@ def litigation_view_all(request):
 def litigation_view_file(request, file_id): # TODO: Arrange works in reverse order. Both litigation and non litigation
     file = Litigation.objects.get(id=file_id)
     document_link = True if file.document_link else False
-    works = WorkLigitation.objects.filter(litigation=file)
+    works = WorkLigitation.objects.filter(litigation=file).order_by('-id')
     user = User.objects.get(id=request.user.id)
     group = Group.objects.get(name="Payments")
 
@@ -184,7 +191,7 @@ def nonlitigation_view_all(request):
 def nonlitigation_view_file(request, file_id):
     file = NonLitigation.objects.get(id=file_id)
     document_link = True if file.document_link else False
-    works = WorkNonLitigation.objects.filter(non_litigation=file)
+    works = WorkNonLitigation.objects.filter(non_litigation=file).order_by('-id')
     user = User.objects.get(id=request.user.id)
     group = Group.objects.get(name="Payments")
 
@@ -509,7 +516,242 @@ def nonlitigation_payments_edit(request, payment_id):
         }
 
         return render(request, "main/payments_edit.html", data)
+
+@group_required("Litigation")
+def notices_view_all(request):
+    notices_unsorted = list(chain(NoticeSent.objects.all(), NoticeReceived.objects.all()))
+    notices = sorted(notices_unsorted, key=lambda x: (x.completed, x.completion_date))
+
+    data = {
+        "notices": notices,
+    }
+
+    return render(request, "main/notices_view_all.html", data)
+
+
+@group_required("Litigation")
+def notices_create_choices(request):
+    return render(request, "main/notices_new_choice.html")
+
+
+@group_required("Litigation")
+def notices_new_sent(request):
+    if request.method == "POST":
+        name = request.POST["name"]
+        completion_date = request.POST["completion_date"]
+
+        NoticeSent.objects.create(
+            name=name,
+            completion_date=completion_date
+        )
+
+        return redirect("notices_view_all")
+    else:
+        return render(request, "main/notices_new_sent.html")
     
+
+@group_required("Litigation")
+def notices_new_received(request):
+    if request.method == "POST":
+        name = request.POST["name"]
+        notice_type = request.POST["type"]
+        if notice_type == "NI":
+            ni_deadline = request.POST["ni_deadline"]
+        received_date_client = request.POST["received_date_client"]
+        received_date_office = request.POST["received_date_office"]
+        received_employee = User.objects.get(id=request.POST["received_employee"])
+        completion_date = request.POST["completion_date"]
+
+        NoticeReceived.objects.create(
+            name=name,
+            type=notice_type,
+            received_date_client=received_date_client,
+            received_date_office=received_date_office,
+            received_employee=received_employee,
+            completion_date=completion_date,
+            ni_deadline=ni_deadline if notice_type == "NI" else None,
+        )
+
+        return redirect("notices_view_all")
+    else:
+        employees = User.objects.filter(groups__name="Employees")
+        ni_deadline = datetime.now() + timedelta(days=30)
+        data = {
+            "employees": employees,
+            "ni_deadline": ni_deadline.strftime("%Y-%m-%d"),
+            "office_received_date": datetime.now().strftime("%Y-%m-%d"),
+        }
+
+        return render(request, "main/notices_new_received.html", data)
+    
+
+@group_required("Litigation")
+def notices_view_sent_notice(request, notice_id):
+    notice = NoticeSent.objects.get(id=notice_id)
+
+    data = {
+        "notice": notice
+    }
+    
+    return render(request, "main/notices_view_sent_notice.html", data)
+
+
+@group_required("Litigation")
+def notices_view_sent_notice_add_sent_date(request, notice_id):
+    notice = NoticeSent.objects.get(id=notice_id)
+    notice.sent_date = request.POST["notice_sent_date"]
+    notice.save()
+
+    return redirect(f"/notices/view/sent/{notice_id}/")
+
+
+@group_required("Litigation")
+def notices_view_sent_notice_add_tracking_number(request, notice_id):
+    notice = NoticeSent.objects.get(id=notice_id)
+    notice.tracking_number = request.POST["tracking_number"]
+    notice.save()
+
+    return redirect(f"/notices/view/sent/{notice_id}/")
+
+
+@group_required("Litigation")
+def notices_view_sent_notice_add_acknowledgement_details(request, notice_id):
+    notice = NoticeSent.objects.get(id=notice_id)
+    notice.acknowledgement = request.POST["acknowledgement"]
+    notice.acknowledgement_received_date = request.POST["acknowledgement_received_date"]
+    notice.save()
+
+    return redirect(f"/notices/view/sent/{notice_id}/")
+
+
+@group_required("Litigation")
+def notices_view_sent_notice_add_notice_document(request, notice_id):
+    notice = NoticeSent.objects.get(id=notice_id)
+    notice_document = request.FILES.get("notice_document")
+    path = f"{notice_id}/notice_document/{notice_document.name}"
+    notice.notice_document.save(path, notice_document)
+    notice.save()
+
+    return redirect(f"/notices/view/sent/{notice_id}/")
+
+
+@group_required("Litigation")
+def notices_view_sent_notice_completed(request, notice_id):
+    notice = NoticeSent.objects.get(id=notice_id)
+    if not notice.completed:
+        notice.completed = True
+    else:
+        notice.completed = False
+    notice.save()
+
+    return redirect(f"/notices/view/")
+
+
+@group_required("Litigation")
+def notices_sent_transfer(request, notice_id):
+    notice = NoticeSent.objects.get(id=notice_id)
+    if request.method == "POST":
+        name = request.POST["name"]
+        case_type = request.POST.get("case_type")
+        if not case_type:
+            data = {
+                "notice": notice,
+                "error_message": "Case Type not specified. Please specify"
+            }
+            return render(request, "main/notices_to_litigation.html", data)
+        case_number = f'{request.POST["case_number_1"]}/{request.POST["case_number_2"]}'
+        document_link = request.POST["document_link"]
+        representing_for = request.POST["representing_for"]
+
+        Litigation.objects.create(
+            name=name,
+            case_type=case_type,
+            case_number=case_number,
+            representing_for=representing_for,
+            document_link=document_link,
+            rough_work_pic=request.FILES.get("rough_picture")
+        )
+
+        return redirect("litigation_view_all")
+    else:
+        data = {
+            "type": "sent",
+            "notice": notice
+        }
+
+        return render(request, "main/notices_to_litigation.html", data)
+
+
+@group_required("Litigation")
+def notices_view_received(request, notice_id):
+    notice = NoticeReceived.objects.get(id=notice_id)
+
+    data = {
+        "notice": notice,
+    }
+
+    return render(request, "main/notices_view_received_notice.html", data)
+
+
+@group_required("Litigation")
+def notices_view_received_add_reply_notice(request, notice_id):
+    notice = NoticeReceived.objects.get(id=notice_id)
+    reply_notice_document = request.FILES.get("reply_notice_document")
+    path = f"{notice_id}/reply_notice_document/{reply_notice_document.name}"
+    notice.reply_notice_document.save(path, reply_notice_document)
+    notice.reply_notice_sent = True
+    notice.reply_notice_sent_date = datetime.now().date()
+    notice.save()
+
+    return redirect(f"/notices/view/received/{notice_id}/")
+
+
+@group_required("Litigation")
+def notices_view_received_completed(request, notice_id):
+    notice = NoticeReceived.objects.get(id=notice_id)
+    if not notice.completed:
+        notice.completed = True
+    else:
+        notice.completed = False
+    notice.save()
+
+    return redirect(f"/notices/view/")
+
+
+@group_required("Litigation")
+def notices_received_transfer(request, notice_id):
+    notice = NoticeReceived.objects.get(id=notice_id)
+    if request.method == "POST":
+        name = request.POST["name"]
+        case_type = request.POST.get("case_type")
+        if not case_type:
+            data = {
+                "notice": notice,
+                "error_message": "Case Type not specified. Please specify"
+            }
+            return render(request, "main/notices_to_litigation.html", data)
+        case_number = f'{request.POST["case_number_1"]}/{request.POST["case_number_2"]}'
+        document_link = request.POST["document_link"]
+        representing_for = request.POST["representing_for"]
+
+        Litigation.objects.create(
+            name=name,
+            case_type=case_type,
+            case_number=case_number,
+            representing_for=representing_for,
+            document_link=document_link,
+            rough_work_pic=request.FILES.get("rough_picture")
+        )
+
+        return redirect("litigation_view_all")
+    else:
+        data = {
+            "type": "received",
+            "notice": notice
+        }
+
+        return render(request, "main/notices_to_litigation.html", data)
+
 
 # Errors
 def no_access(request):

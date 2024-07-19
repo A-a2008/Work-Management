@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Notices (Sent)</h1>
+        <h2>View and Edit this notice</h2>
+    </header>
+    <p>
+        <div class="work row gtr-uniform">
+            <div class="col-12 col-12-xsmall">
+                Name: <b>{{ notice.name }}</b>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                Completion Date: <b>{{ notice.completion_date }}</b>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                {% if notice.notice_document %}
+                <a href="{{ notice.notice_document.url }}" class="button small" download>Download Document - {{ notice.notice_file_name }}</a>
+                <a class="button small primary" id="add_notice_document_button">Change</a>
+                {% else %}
+                <a class="button small" id="add_notice_document_button">Add Notice Document</a>
+                {% endif %}
+                <form id="add_notice_document" action="{% url 'notices_view_sent_notice_add_notice_document' notice_id=notice.id %}" method="post" enctype="multipart/form-data" style="display: none;">
+                    {% csrf_token %}
+                    <div class="row gtr-uniform">
+                        <div class="col-12 col-12-xsmall">
+                            <input type="file" name="notice_document" placeholder="Add Notice Document..." required>
+                        </div>
+                        <div class="col-12 col-12-xsmall">
+                            <input type="submit" class="small primary">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                {% if notice.sent_date %}
+                Notice was sent on: <b>{{ notice.sent_date }}</b>
+                {% else %}
+                <a id="add_notice_sent_date_button" class="button small">Add Notice Sent date</a>
+                <form id="add_notice_sent_date" action="{% url 'notices_view_sent_notice_add_sent_date' notice_id=notice.id %}" method="post" style="display: none;">
+                    {% csrf_token %}
+                    <div class="row gtr-uniform">
+                        <div class="col-12 col-12-xsmall">
+                            Notice Sent Date: <input type="date" name="notice_sent_date" required>
+                        </div>
+                        <div class="col-12 col-12-xsmall">
+                            <input type="submit" class="small primary">
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            <div class="col-12 col-12-xsmall">
+                {% if notice.tracking_number %}
+                Tracking Number: <b>{{ notice.tracking_number }}</b>
+                {% else %}
+                <a class="button small" id="tracking_number_button">Add Tracking Number</a>
+                <form id="tracking_number" action="{% url 'notices_view_sent_notice_add_tracking_number' notice_id=notice.id %}" style="display: none;" method="post">
+                    {% csrf_token %}
+                    Tracking Number: <input type="text" name="tracking_number" placeholder="Tracking Number" required><br>
+                    <input type="submit" class="small primary" value="Add">
+                </form> 
+                {% endif %}
+            </div>
+            <div class="col-12 col-12-xsmall">
+                {% if notice.acknowledgement %}
+                Acknowledgement: <b>{{ notice.acknowledgement }}</b> on <b>{{ notice.acknowledgement_received_date }}</b>
+                {% else %}
+                <a class="button small" id="acknowledgement_details_button">Acknoledgement Details</a>
+                    <form id="acknowledgement_details" action="{% url 'notices_view_sent_notice_add_acknowledgement_details' notice_id=notice.id %}" style="display: none;" method="post">
+                        {% csrf_token %}
+                        <div class="row gtr-uniform">
+                            <div class="col-6 col-6-xsmall">
+                                Acknowledgement: <select name="acknowledgement" required>
+                                    <option value="Received">Received</option>
+                                    <option value="Refused">Refused</option>
+                                    <option value="Adress not Found">Address not Found</option>
+                                    <option value="Addressee Left">Addressee Left</option>
+                                    <option value="Door Locked">Door Locked</option>
+                                    <option value="Informed to sender">Informed to sender</option>
+                                    <option value="Not claimed">Not claimed</option>
+                                    <option value="Addressee cannot be located">Addressee cannot be located</option>
+                                    <option value="Lost in transit">Lost in transit</option>
+                                    <option value="Insufficient Address">Insufficient Address</option>
+                                    <option value="No such person">No such person</option>
+                                    <option value="Deceased">Deceased</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-6-xsmall">
+                                Acknowledgemnt Received Date: <input type="date" name="acknowledgement_received_date" required>
+                            </div>
+                            <div class="col-12 col-12-xsmall">
+                                <input type="submit" class="small primary">
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+            <div class="col-12 col-12-xsmall">
+                <a href="{% url 'notices_view_sent_notice_completed' notice_id=notice.id %}" 
+                class="{% if not notice.completed %}button primary{% else %}small button{% endif %}">
+                    {% if not notice.completed %}
+                    Complete
+                    {% else %}
+                    Re-open
+                    {% endif %}
+                </a>
+            </div>
+            <div class="col-12 col-12-xsmall">
+                <a href="{% url 'notices_sent_transfer' notice_id=notice.id %}" class="button small">Transfer to Lititgation</a>
+            </div>
+        </div>
+    </p>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleLink = document.getElementById('tracking_number_button');
+        var form = document.getElementById('tracking_number');
+    
+        toggleLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+    
+            // Toggle form visibility
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                toggleLink.style.display = 'none'; // Hide the link when form is shown
+            } else {
+                form.style.display = 'none';
+                toggleLink.style.display = 'inline'; // Show the link when form is hidden
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleLink = document.getElementById('acknowledgement_details_button');
+        var form = document.getElementById('acknowledgement_details');
+    
+        toggleLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+    
+            // Toggle form visibility
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                toggleLink.style.display = 'none'; // Hide the link when form is shown
+            } else {
+                form.style.display = 'none';
+                toggleLink.style.display = 'inline'; // Show the link when form is hidden
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleLink = document.getElementById('add_notice_document_button');
+        var form = document.getElementById('add_notice_document');
+    
+        toggleLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+    
+            // Toggle form visibility
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                toggleLink.style.display = 'none'; // Hide the link when form is shown
+            } else {
+                form.style.display = 'none';
+                toggleLink.style.display = 'inline'; // Show the link when form is hidden
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleLink = document.getElementById('add_notice_sent_date_button');
+        var form = document.getElementById('add_notice_sent_date');
+    
+        toggleLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+    
+            // Toggle form visibility
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                toggleLink.style.display = 'none'; // Hide the link when form is shown
+            } else {
+                form.style.display = 'none';
+                toggleLink.style.display = 'inline'; // Show the link when form is hidden
+            }
+        });
+    });
+</script>
+
+{% endblock %}

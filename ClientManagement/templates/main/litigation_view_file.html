@@ -52,7 +52,7 @@
         <a href="{% url 'litigation_work_new' file_id=file.id %}" class="button">Create New</a>
         <br><br>
         {% if works %}
-        <ol>
+        <ul>
             {% for work in works %}
             <li class="work">
                 <p>
@@ -72,7 +72,7 @@
                 <hr>
             </li>
             {% endfor %}
-        </ol>
+        </ul>
         {% else %}
         <br>
         No work assigned yet. Create one now!

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <header class="main">
+        <h1>Notices (Send)</h1>
+        <h2>Fill the details to create a notice being sent</h2>
+    </header>
+    <p>
+        {% if error_message %}
+        <p class="error">{{ error_message }}</p>
+        {% endif %}
+        <form action="{% url 'notices_new_sent' %}" method="post">
+            {% csrf_token %}
+            <div class="row gtr-uniform">
+                <div class="col-12 col-12-xsmall">
+                    Client Name: <input type="text" name="name" placeholder="Name" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    Completion Date: <input type="date" name="completion_date" required>
+                </div>
+                <div class="col-12 col-12-xsmall">
+                    <input type="submit" value="Create"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="reset" value="Reset">
+                </div>
+            </div>
+        </form>
+    </p>
+</section>
+{% endblock %}
