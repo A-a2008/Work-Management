@@ -36,6 +36,11 @@
 											<a href="{% url 'notices_view_all' %}" class="button large">Notices</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											{% endif %}
 										</div>
+										<div class="col-12 col-12-xsmall">
+											{% if not litigation_ and not nonlitigation_ %}
+											If you are not able to view elements on the homepage, please ask your admin to give you the permissions
+											{% endif %}
+										</div>
 										{% else %}
 										<div class="col-12 col-12-xsmall">
 											<a href="{% url 'login' %}" class="button primary large">Login</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

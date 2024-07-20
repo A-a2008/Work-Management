@@ -756,3 +756,31 @@ def notices_received_transfer(request, notice_id):
 # Errors
 def no_access(request):
     return render(request, "errors/group.html")
+
+def error_400(request, exception):
+    data = {
+        "error": "400 - Bad Request",
+        "tagline": "The request could not be understood by the server. Please check your request and try again."
+    }
+    return render(request, "errors/error.html", data)
+
+def error_403(request, exception):
+    data = {
+        "error": "403 - Forbidden",
+        "tagline": "You don't have permission to access this page. If you believe this is an error, please contact support."
+    }
+    return render(request, "errors/error.html", data)
+
+def error_404(request, exception):
+    data = {
+        "error": "404 - Page Not Found",
+        "tagline": "The requested page was not found. Please try another one."
+    }
+    return render(request, "errors/error.html", data)
+
+def error_500(request):
+    data = {
+        "error": "500 - Internal Server Error",
+        "tagline": "Something went wrong on our end. Please try again later or contact support."
+    }
+    return render(request, "errors/error.html", data)
