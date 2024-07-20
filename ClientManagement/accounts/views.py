@@ -92,7 +92,7 @@ def reset_password_verify_email(request):
         if User.objects.filter(email=email).exists():
             global email_verification_code
             email_verification_code = str(random.randint(1111, 9999))
-            subject = "Reset Password for EventHub"
+            subject = "Reset Password for SLA Office"
             email_data = {
                 "otp": str(email_verification_code),
             }
